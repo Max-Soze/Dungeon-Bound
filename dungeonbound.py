@@ -2,6 +2,7 @@ import pygame, numpy, json, sys, ctypes
 from pygame.locals import *
 
 from roommap import RoomMap
+from character import Character
 
 # Window and framerates
 FPS = 30
@@ -14,6 +15,7 @@ CELLSIZE = 50
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+#Other
 DATA = {}
 
 def main():
@@ -31,7 +33,7 @@ def main():
     try:
         loadDat()
     except:
-        with open("savegame.json", "w") as init:
+        with open("src/savegame.json", "w") as init:
             json.dump(DATA, init)
     #showStart
     while(True):
@@ -47,6 +49,7 @@ def runGame():
 
     #testing
     test = RoomMap("floor")
+    player = Character("boi", 50, 50)
 
     while(True):
         #event handler
@@ -58,11 +61,19 @@ def runGame():
                     terminate()
 
         # drawing
-        DISPLAYSURF.fill(WHITE)
+        DISPLAYSURF.fill(BLACK)
         DISPLAYSURF.blit(pygame.image.load("src/art/st_floor.png"), (200, 200, 50, 50))
         drawRoom(test.map)
+        drawChar(player)
         pygame.display.update()
         FPSCLOCK.tick(FPS)
+
+
+def drawChar(char):
+    x = char.xPos * CELLSIZE + 100
+    y = char.yPos * CELLSIZE + 150
+    char.rect.topleft = (x, y)
+    DISPLAYSURF.blit(char.image, char.rect)
 
 def drawRoom(room):
     for x in range(len(room)):
@@ -77,12 +88,12 @@ def terminate():
 
 def saveDat():
     global DATA
-    with open("savegame.json", "w") as save:
+    with open("src/savegame.json", "w") as save:
         json.dump(DATA, save)
 
 def loadDat():
     global DATA
-    with open("savegame.json", "r") as load:
+    with open("src/savegame.json", "r") as load:
         DATA = json.load(load)
 
 if __name__ == "__main__":
