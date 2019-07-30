@@ -1,4 +1,4 @@
-import pygame, numpy, pickle, sys, ctypes
+import pygame, numpy, json, sys, ctypes
 from pygame.locals import *
 
 from roommap import RoomMap
@@ -33,8 +33,8 @@ def main():
     try:
         loadDat()
     except:
-        with open("src/savegame.dat", "wb") as init:
-            pickle.dump(DATA, init)
+        with open("src/savegame.json", "w") as init:
+            json.dump(DATA, init)
     #showStart
     while(True):
         runGame()
@@ -212,13 +212,13 @@ def saveDat(upds):
     global DATA
     for save in upds:
         DATA.update(save)
-    with open("src/savegame.dat", "wb") as save:
-        pickle.dump(DATA, save)
+    with open("src/savegame.json", "w") as save:
+        json.dump(DATA, save)
 
 def loadDat():
     global DATA
-    with open("src/savegame.dat", "rb") as load:
-        DATA = pickle.load(load)
+    with open("src/savegame.json", "r") as load:
+        DATA = json.load(load)
 
 if __name__ == "__main__":
     main()
