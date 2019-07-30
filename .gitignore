@@ -1,6 +1,7 @@
 # Python files
 *.pyc
 *.pyo
+__pycache__/*
 
 # Src, and VS files
 .vs/*

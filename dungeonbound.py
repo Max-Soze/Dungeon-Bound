@@ -3,6 +3,8 @@ from pygame.locals import *
 
 from roommap import RoomMap
 from character import Character
+from enemy import Enemy
+from button import Button
 
 # Window and framerates
 FPS = 30
@@ -15,10 +17,10 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 #Other
-DATA = {"playerX":0, "playerY":0}
+DATA = {"playerX":0, "playerY":0, 'skelDead':False}
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, ALPHAFONT
+    global FPSCLOCK, DISPLAYSURF
 
     ctypes.windll.user32.SetProcessDPIAware()
     pygame.init()
@@ -27,7 +29,6 @@ def main():
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
     pygame.display.set_caption("Dungeon Bound")
-    ALPHAFONT = pygame.font.Font("freesansbold.ttf", 18)
 
     try:
         loadDat()
@@ -46,17 +47,21 @@ def runGame():
     direction = None
     saving = False
     posDat = {}
-    mouseX = 0
-    mouseY = 0
+    deadFoes = {}
     upds = ()
 
     #set up character
     player = Character(50, 50)
     player.xPos = DATA['playerX']
-    player.yPos = DATA['playerY']
+    player.yPos = DATA['playerY']   
 
     #testing
     test = RoomMap("floor")
+    skeleton = Enemy("Skeleton", 20, (4, 6), "src/art/skellie.png", {'standard':5, })
+
+    #load game state
+    skeleton.defeated = DATA['skelDead']
+    
 
     while(True):
         #event handler
@@ -89,19 +94,96 @@ def runGame():
         player.move(direction)
         direction = None
 
+        if player.xPos == skeleton.xPos and player.yPos == skeleton.yPos:
+            combat(player, skeleton)
+
         # drawing
         DISPLAYSURF.fill(BLACK)
         DISPLAYSURF.blit(pygame.image.load("src/art/st_floor.png"), (200, 200, 50, 50))
         drawRoom(test.map)
+        if not skeleton.defeated:
+            drawChar(skeleton)
         drawChar(player)
         pygame.display.update()
-        FPSCLOCK.tick(FPS)
-
+        
         #saves
         if saving == True:
             saving = False
             posDat.update({'playerX':player.xPos, 'playerY':player.yPos})
-            upds = (posDat,)
+            deadFoes.update({'skelDead':skeleton.defeated})
+            upds = (posDat, deadFoes)
+        
+        FPSCLOCK.tick(FPS)
+
+
+def combat(player, enemy):
+    mouseX = 0
+    mouseY = 0
+    clicked = False
+    attackButton = Button("src/art/attack_button.png", (550, 600))
+    playerDamage = 0
+    enemyDamage = 0
+    
+    while(True):
+        #event handler
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                terminate(())
+            elif event.type == MOUSEBUTTONUP:
+                mouseX, mouseY = event.pos
+                clicked = True
+
+        #event controller
+        if attackButton.rect.collidepoint((mouseX, mouseY)) and clicked:
+            clicked = False
+            playerDamage = player.attack('standard')
+            enemyDamage = enemy.attacks[numpy.random.choice(('standard',))]
+
+        #wombat controller
+        enemy.health -= playerDamage
+        player.health -= enemyDamage
+        playerDamage = 0
+        enemyDamage = 0
+        if enemy.health <= 0:
+            fightWon(enemy)
+            return
+                
+        #drawing
+        DISPLAYSURF.fill(BLACK)
+        DISPLAYSURF.blit(attackButton.image, attackButton.rect)
+        drawCombatHUD(player.health, player.mana)
+        drawEnemyHUD(enemy.name, enemy.health)
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+
+def fightWon(enemy):
+    enemy.defeated = True
+
+def drawCombatHUD(health, mana):
+    fontHUD = pygame.font.Font("freesansbold.ttf", 36)
+    nameSurf = fontHUD.render("Hero", True, WHITE)
+    nameRect = nameSurf.get_rect()
+    healthSurf = fontHUD.render("Health: "+str(health), True, WHITE)
+    healthRect = healthSurf.get_rect()
+    manaSurf = fontHUD.render("Mana: "+str(mana), True, WHITE)
+    manaRect = manaSurf.get_rect()
+    nameRect.topleft = (50, 50)
+    healthRect.topleft = (50, nameRect.bottom + 15)
+    manaRect.topleft = healthRect.bottomleft
+    DISPLAYSURF.blit(nameSurf, nameRect)
+    DISPLAYSURF.blit(healthSurf, healthRect)
+    DISPLAYSURF.blit(manaSurf, manaRect)
+
+def drawEnemyHUD(name, health):
+    fontHUD = pygame.font.Font("freesansbold.ttf", 36)
+    nameSurf = fontHUD.render(name, True, WHITE)
+    nameRect = nameSurf.get_rect()
+    healthSurf = fontHUD.render("Health: "+str(health), True, WHITE)
+    healthRect = healthSurf.get_rect()
+    nameRect.topright = (WINDOWWIDTH - 50, 50)
+    healthRect.topright = (WINDOWWIDTH - 50, nameRect.bottom + 15)
+    DISPLAYSURF.blit(nameSurf, nameRect)
+    DISPLAYSURF.blit(healthSurf, healthRect)
 
 
 def drawChar(char):
