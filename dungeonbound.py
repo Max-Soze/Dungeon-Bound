@@ -17,7 +17,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 #Other
-DATA = {"playerX":0, "playerY":0}
+DATA = {"playerX":0, "playerY":0, "beatFoes":[]}
 
 def main():
     global FPSCLOCK, DISPLAYSURF
@@ -47,6 +47,8 @@ def runGame():
     direction = None
     saving = False
     posDat = {}
+    beatFoes = []
+    badGuys = []
     upds = ()
 
     #set up character
@@ -54,9 +56,15 @@ def runGame():
     player.xPos = DATA['playerX']
     player.yPos = DATA['playerY']
 
+    #load game state
+    beatFoes = DATA['beatFoes']
+    for foe in beatFoes:
+        foe.defeated = True
+
     #testing
     test = RoomMap("floor")
     testFoe = Enemy("Skelleboi", 20, (4, 6), "src/art/skellie.png", {'standard':5, })
+    badGuys.append(testFoe)
 
     while(True):
         #event handler
@@ -105,6 +113,9 @@ def runGame():
         if saving == True:
             saving = False
             posDat.update({'playerX':player.xPos, 'playerY':player.yPos})
+            for badGuy in badGuys:
+                if badGuy not in beatFoes and badGuy.defeated:
+                    beatFoes.append(badGuy)
             upds = (posDat,)
         
         FPSCLOCK.tick(FPS)
