@@ -5,7 +5,7 @@ class Character:
     def __init__(self, hp, mp):
         self.health = hp
         self.mana = mp
-        self.attacks = {'standard':7}
+        self.abilities = []
         self.inventory = []
         self.xPos = 0
         self.yPos = 0
@@ -29,6 +29,3 @@ class Character:
         elif direction == "down":
             self.yPos += 1
             self.image = self.image_front
-
-    def attack(self, choice):
-        return self.attacks[choice]
