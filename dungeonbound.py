@@ -46,8 +46,6 @@ def runGame():
     direction = None
     saving = False
     posDat = {}
-    mouseX = 0
-    mouseY = 0
     upds = ()
 
     #set up character
@@ -80,6 +78,7 @@ def runGame():
         #movement controller
         if player.xPos == 0 and direction == 'left':
             direction = None
+            combat(saving)
         if player.xPos == 9 and direction == 'right':
             direction = None
         if player.yPos == 0 and direction == 'up':
@@ -95,13 +94,42 @@ def runGame():
         drawRoom(test.map)
         drawChar(player)
         pygame.display.update()
-        FPSCLOCK.tick(FPS)
-
+        
         #saves
         if saving == True:
             saving = False
             posDat.update({'playerX':player.xPos, 'playerY':player.yPos})
             upds = (posDat,)
+        
+        FPSCLOCK.tick(FPS)
+
+
+def combat(enemy):
+    mouseX = 0
+    mouseY = 0
+    clicked = False
+    
+    while(True):
+        #event handler
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                terminate(())
+            elif event.type == MOUSEBUTTONUP:
+                mouseX, mouseY = event.pos
+                clicked = True
+
+        #drawing
+        DISPLAYSURF.fill(BLACK)
+        drawMenu()
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+
+def drawMenu():
+    menuFont = pygame.font.Font("freesansbold.ttf", 60)
+    attackSurf = menuFont.render("ATTACK", True, BLACK, WHITE)
+    attackRect = attackSurf.get_rect()
+    attackRect.topleft = (550, 600)
+    DISPLAYSURF.blit(attackSurf, attackRect)
 
 
 def drawChar(char):
