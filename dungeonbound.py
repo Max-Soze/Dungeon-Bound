@@ -56,7 +56,7 @@ def runGame():
 
     #testing
     test = RoomMap("floor")
-    testFoe = Enemy("Skelleboi", 20, {'standard':5, })
+    testFoe = Enemy("Skelleboi", 20, (4, 6), "src/art/skellie.png", {'standard':5, })
 
     while(True):
         #event handler
@@ -80,7 +80,6 @@ def runGame():
         #movement controller
         if player.xPos == 0 and direction == 'left':
             direction = None
-            combat(player, testFoe)
         if player.xPos == 9 and direction == 'right':
             direction = None
         if player.yPos == 0 and direction == 'up':
@@ -90,10 +89,15 @@ def runGame():
         player.move(direction)
         direction = None
 
+        if player.xPos == testFoe.xPos and player.yPos == testFoe.yPos:
+            combat(player, testFoe)
+
         # drawing
         DISPLAYSURF.fill(BLACK)
         DISPLAYSURF.blit(pygame.image.load("src/art/st_floor.png"), (200, 200, 50, 50))
         drawRoom(test.map)
+        if not testFoe.defeated:
+            drawChar(testFoe)
         drawChar(player)
         pygame.display.update()
         
@@ -135,7 +139,7 @@ def combat(player, enemy):
         playerDamage = 0
         enemyDamage = 0
         if enemy.health <= 0:
-            fightWon()
+            fightWon(enemy)
             return
                 
         #drawing
@@ -146,8 +150,8 @@ def combat(player, enemy):
         pygame.display.update()
         FPSCLOCK.tick(FPS)
 
-def fightWon():
-    None
+def fightWon(enemy):
+    enemy.defeated = True
 
 def drawCombatHUD(health, mana):
     fontHUD = pygame.font.Font("freesansbold.ttf", 36)
