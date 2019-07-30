@@ -17,7 +17,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 #Other
-DATA = {"playerX":0, "playerY":0, "beatFoes":[]}
+DATA = {"playerX":0, "playerY":0, 'skelDead':False}
 
 def main():
     global FPSCLOCK, DISPLAYSURF
@@ -47,24 +47,21 @@ def runGame():
     direction = None
     saving = False
     posDat = {}
-    beatFoes = []
-    badGuys = []
+    deadFoes = {}
     upds = ()
 
     #set up character
     player = Character(50, 50)
     player.xPos = DATA['playerX']
-    player.yPos = DATA['playerY']
-
-    #load game state
-    beatFoes = DATA['beatFoes']
-    for foe in beatFoes:
-        foe.defeated = True
+    player.yPos = DATA['playerY']   
 
     #testing
     test = RoomMap("floor")
-    testFoe = Enemy("Skelleboi", 20, (4, 6), "src/art/skellie.png", {'standard':5, })
-    badGuys.append(testFoe)
+    skeleton = Enemy("Skeleton", 20, (4, 6), "src/art/skellie.png", {'standard':5, })
+
+    #load game state
+    skeleton.defeated = DATA['skelDead']
+    
 
     while(True):
         #event handler
@@ -97,15 +94,15 @@ def runGame():
         player.move(direction)
         direction = None
 
-        if player.xPos == testFoe.xPos and player.yPos == testFoe.yPos:
-            combat(player, testFoe)
+        if player.xPos == skeleton.xPos and player.yPos == skeleton.yPos:
+            combat(player, skeleton)
 
         # drawing
         DISPLAYSURF.fill(BLACK)
         DISPLAYSURF.blit(pygame.image.load("src/art/st_floor.png"), (200, 200, 50, 50))
         drawRoom(test.map)
-        if not testFoe.defeated:
-            drawChar(testFoe)
+        if not skeleton.defeated:
+            drawChar(skeleton)
         drawChar(player)
         pygame.display.update()
         
@@ -113,10 +110,8 @@ def runGame():
         if saving == True:
             saving = False
             posDat.update({'playerX':player.xPos, 'playerY':player.yPos})
-            for badGuy in badGuys:
-                if badGuy not in beatFoes and badGuy.defeated:
-                    beatFoes.append(badGuy)
-            upds = (posDat,)
+            deadFoes.update({'skelDead':skeleton.defeated})
+            upds = (posDat, deadFoes)
         
         FPSCLOCK.tick(FPS)
 
