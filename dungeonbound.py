@@ -42,14 +42,11 @@ def main():
 
 def runGame():
     # set up game
-    left = False
-    right = False
-    up = False
-    down = False
+    direction = None
+    player = Character(50, 50)
 
     #testing
     test = RoomMap("floor")
-    player = Character("boi", 50, 50)
 
     while(True):
         #event handler
@@ -59,6 +56,18 @@ def runGame():
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     terminate()
+                elif event.key == K_d:
+                    direction = "right"
+                elif event.key == K_a:
+                    direction = "left"
+                elif event.key == K_w:
+                    direction = "up"
+                elif event.key == K_s:
+                    direction = "down"
+        
+        #movement controller
+        player.move(direction)
+        direction = None
 
         # drawing
         DISPLAYSURF.fill(BLACK)
