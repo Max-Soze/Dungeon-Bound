@@ -73,8 +73,8 @@ def runGame():
 
     #testing
     test = RoomMap("floor")
-    skeleton = Enemy("Evil Knight", numpy.random.randint(15, 30), (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
-    knight = Enemy("Evil Knight", numpy.random.randint(15, 30), (7, 3), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
+    skeleton = Enemy("Evil Knight", numpy.random.randint(20, 36), (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
+    knight = Enemy("Evil Knight", numpy.random.randint(20, 36), (7, 3), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
 
     #load game state
     skeleton.defeated = DATA['skelDead']

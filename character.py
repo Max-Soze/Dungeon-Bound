@@ -33,6 +33,6 @@ class Character:
             self.image = self.image_front
 
     def attack(self, choice):
-        standardDMG = numpy.random.randint(6,9)
+        standardDMG = numpy.random.randint(6,10)
         self.attacks.update({'standard':standardDMG})
         return self.attacks[choice]
