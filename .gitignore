@@ -3,6 +3,9 @@
 *.pyo
 __pycache__/*
 
+# Build files
+setup.py
+
 # Src, and VS files
 .vs/*
 src/*

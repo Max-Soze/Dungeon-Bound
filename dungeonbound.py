@@ -94,7 +94,7 @@ def runGame():
         player.move(direction)
         direction = None
 
-        if player.xPos == skeleton.xPos and player.yPos == skeleton.yPos:
+        if player.xPos == skeleton.xPos and player.yPos == skeleton.yPos and not skeleton.defeated:
             combat(player, skeleton)
 
         # drawing
