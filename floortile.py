@@ -6,6 +6,6 @@ class FloorTile:
         self.type = type
         if self.type == "st_floor":
             self.image = pygame.image.load("src/art/st_floor.png")
-        elif self.type == "cb_floor":
-            self.image = pygame.image.load("src/art/combat_floor.png")
+        elif self.type == "wall":
+            self.image = pygame.image.load("src/art/wall_tile.png")
         self.rect = self.image.get_rect()
