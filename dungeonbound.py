@@ -22,7 +22,7 @@ DARKGREEN   = (  0, 155,   0)
 DARKGRAY    = ( 40,  40,  40)
 
 #Other
-DATA = {"playerX":0, "playerY":0, 'skelDead':False}
+DATA = {"playerX":0, "playerY":0, 'skelDead':False, 'knightDead':False}
 
 def main():
     global FPSCLOCK, DISPLAYSURF
@@ -62,10 +62,12 @@ def runGame():
 
     #testing
     test = RoomMap("floor")
-    skeleton = Enemy("Evil Knight", 20, (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
+    skeleton = Enemy("Evil Knight", numpy.random.randint(15, 30), (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
+    knight = Enemy("Evil Knight", numpy.random.randint(15, 30), (7, 3), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
 
     #load game state
     skeleton.defeated = DATA['skelDead']
+    knight.defeated = DATA['knightDead']
     
 
     while(True):
@@ -101,6 +103,8 @@ def runGame():
 
         if player.xPos == skeleton.xPos and player.yPos == skeleton.yPos and not skeleton.defeated:
             combat(player, skeleton)
+        if player.xPos == knight.xPos and player.yPos == knight.yPos and not knight.defeated:
+            combat(player, knight)
 
         # drawing
         DISPLAYSURF.fill(BLACK)
@@ -108,6 +112,8 @@ def runGame():
         drawRoom(test.map)
         if not skeleton.defeated:
             drawChar(skeleton)
+        if not knight.defeated:
+            drawChar(knight)
         drawChar(player)
         pygame.display.update()
         
@@ -115,7 +121,7 @@ def runGame():
         if saving == True:
             saving = False
             posDat.update({'playerX':player.xPos, 'playerY':player.yPos})
-            deadFoes.update({'skelDead':skeleton.defeated})
+            deadFoes.update({'skelDead':skeleton.defeated, 'knightDead':knight.defeated})
             upds = (posDat, deadFoes)
         
         FPSCLOCK.tick(FPS)
