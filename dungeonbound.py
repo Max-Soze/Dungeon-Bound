@@ -14,8 +14,12 @@ WINDOWHEIGHT = 900
 CELLSIZE = 50
 
 # Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
+WHITE       = (255, 255, 255)
+BLACK       = (  0,   0,   0)
+RED         = (255,   0,   0)
+GREEN       = (  0, 255,   0)
+DARKGREEN   = (  0, 155,   0)
+DARKGRAY    = ( 40,  40,  40)
 
 #Other
 DATA = {"playerX":0, "playerY":0, 'skelDead':False}
@@ -36,7 +40,7 @@ def main():
     except:
         with open("src/savegame.json", "w") as init:
             json.dump(DATA, init)
-    #showStart
+    showStartScreen()
     while(True):
         runGame()
         #gameOver
@@ -168,6 +172,34 @@ def drawFight(player, enemy):
     player.rect_big.bottomleft = (230, 800)
     DISPLAYSURF.blit(player.image_big, player.rect_big)
 
+def showStartScreen():
+    
+    while(True):
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()        
+        startFont = pygame.font.Font('freesansbold.ttf', 100)
+        startSurf = startFont.render("Dungeon Bound", True, WHITE, RED)
+        startRect = startSurf.get_rect()
+        startRect.center = (WINDOWWIDTH/2, WINDOWHEIGHT/2)
+        DISPLAYSURF.blit(startSurf, startRect)
+        pygame.display.update()
+        if checkForKeyPress():
+            pygame.event.get()
+            return
+        FPSCLOCK.tick(FPS)
+
+def checkForKeyPress():
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            terminate()
+        if event.type == KEYUP:
+            if event.key == K_ESCAPE:
+                terminate()
+            else:
+                return True
+    return False
 
 def drawCombatHUD(health, mana):
     fontHUD = pygame.font.Font("freesansbold.ttf", 36)
