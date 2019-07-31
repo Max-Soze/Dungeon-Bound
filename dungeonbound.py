@@ -1,4 +1,4 @@
-import pygame, numpy, json, sys, ctypes
+import pygame, numpy, json, sys, ctypes, os
 import HUD as comDisp
 from pygame.locals import *
 
@@ -31,7 +31,7 @@ PURPLE      = (102,   0, 102)
 LIGHTPURPLE = (153,   0, 153)
 
 #Other
-DATA = {"playerX":0, "playerY":0, 'skelDead':False, 'knightDead':False}
+DATA = {"playerX":0, "playerY":0, 'skelDead':False, 'knightDead':False, 'playerHP':50}
 
 def main():
     global FPSCLOCK, DISPLAYSURF
@@ -61,18 +61,20 @@ def runGame():
     direction = None
     saving = False
     posDat = {}
-    deadFoes = {}
+    deadFoeDat = {}
+    hpDat = {}
     upds = ()
 
     #set up character
     player = Character(50, 50)
     player.xPos = DATA['playerX']
     player.yPos = DATA['playerY']   
+    player.health = DATA['playerHP']
 
     #testing
     test = RoomMap("floor")
-    skeleton = Enemy("Evil Knight", numpy.random.randint(15, 30), (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
-    knight = Enemy("Evil Knight", numpy.random.randint(15, 30), (7, 3), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
+    skeleton = Enemy("Evil Knight", numpy.random.randint(20, 36), (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
+    knight = Enemy("Evil Knight", numpy.random.randint(20, 36), (7, 3), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
 
     #load game state
     skeleton.defeated = DATA['skelDead']
@@ -115,6 +117,10 @@ def runGame():
         if player.xPos == knight.xPos and player.yPos == knight.yPos and not knight.defeated:
             combat(player, knight)
 
+        #event controller
+        if player.health <= 0:
+            showGameOver()
+
         # drawing
         DISPLAYSURF.fill(BLACK)
         DISPLAYSURF.blit(pygame.image.load("src/art/st_floor.png"), (200, 200, 50, 50))
@@ -130,8 +136,9 @@ def runGame():
         if saving == True:
             saving = False
             posDat.update({'playerX':player.xPos, 'playerY':player.yPos})
-            deadFoes.update({'skelDead':skeleton.defeated, 'knightDead':knight.defeated})
-            upds = (posDat, deadFoes)
+            deadFoeDat.update({'skelDead':skeleton.defeated, 'knightDead':knight.defeated})
+            hpDat.update({'playerHP':player.health})
+            upds = (posDat, deadFoeDat, hpDat)
             saveDat(upds)
         
         FPSCLOCK.tick(FPS)
@@ -168,6 +175,8 @@ def combat(player, enemy):
         if enemy.health <= 0:
             fightWon(enemy)
             return
+        if player.health <= 0:
+            showGameOver()
                 
         #drawing
         DISPLAYSURF.fill(BLACK)
@@ -242,7 +251,23 @@ def drawCombatHUD(health, mana):
     DISPLAYSURF.blit(manaSurf, manaRect)
 
 def showGameOver():
-    None
+    endFont = pygame.font.Font("freesansbold.ttf", 200)
+    endSurf = endFont.render("Game Over", True, RED)
+    endRect = endSurf.get_rect()
+    endRect.center = (WINDOWWIDTH/2, 300)
+    endPic = pygame.transform.scale(pygame.image.load("src/art/player_dead.png"), (400, 400))
+    endPicRect = endPic.get_rect()
+    endPicRect.center = (WINDOWWIDTH/2, 600)
+    while(True):
+        DISPLAYSURF.fill(BLACK)
+        DISPLAYSURF.blit(endPic, endPicRect)
+        DISPLAYSURF.blit(endSurf, endRect)
+        if checkForKeyPress():
+            os.remove("src/savegame.json")
+            terminate()
+        pygame.display.update()
+        FPSCLOCK.tick(FPS)
+        
 
 def drawEnemyHUD(name, health):
     fontHUD = pygame.font.Font("freesansbold.ttf", 36)
