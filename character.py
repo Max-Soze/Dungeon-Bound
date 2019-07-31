@@ -13,7 +13,8 @@ class Character:
         self.image_back = pygame.image.load("src/art/player_back.png")
         self.image_right = pygame.image.load("src/art/player_right.png")
         self.image_left = pygame.image.load("src/art/player_left.png")
-        #self.image_big = pygame.image.load("src/art/player_large.png")
+        self.image_big = pygame.transform.scale(pygame.image.load("src/art/player_large.png"), (400, 700))
+        self.rect_big = self.image_big.get_rect()
         self.image = self.image_front
         self.rect = self.image.get_rect()
 

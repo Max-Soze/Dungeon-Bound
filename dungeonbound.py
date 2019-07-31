@@ -165,6 +165,9 @@ def fightWon(enemy):
 def drawFight(player, enemy):
     enemy.bigRect.bottomright = (WINDOWWIDTH - 230, 800)
     DISPLAYSURF.blit(enemy.bigImage, enemy.bigRect)
+    player.rect_big.bottomleft = (230, 800)
+    DISPLAYSURF.blit(player.image_big, player.rect_big)
+
 
 def drawCombatHUD(health, mana):
     fontHUD = pygame.font.Font("freesansbold.ttf", 36)
