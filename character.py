@@ -1,11 +1,11 @@
-import pygame
+import pygame, numpy
 
 class Character:
     
     def __init__(self, hp, mp):
         self.health = hp
         self.mana = mp
-        self.attacks = {'standard':7}
+        self.attacks = {'standard':numpy.random.randint(6,9)}
         self.inventory = []
         self.xPos = 0
         self.yPos = 0
@@ -13,6 +13,7 @@ class Character:
         self.image_back = pygame.image.load("src/art/player_back.png")
         self.image_right = pygame.image.load("src/art/player_right.png")
         self.image_left = pygame.image.load("src/art/player_left.png")
+        #self.image_big = pygame.image.load("src/art/player_large.png")
         self.image = self.image_front
         self.rect = self.image.get_rect()
 
@@ -31,4 +32,6 @@ class Character:
             self.image = self.image_front
 
     def attack(self, choice):
+        standardDMG = numpy.random.randint(6,9)
+        self.attacks.update({'standard':standardDMG})
         return self.attacks[choice]

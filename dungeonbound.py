@@ -57,7 +57,7 @@ def runGame():
 
     #testing
     test = RoomMap("floor")
-    skeleton = Enemy("Skeleton", 20, (4, 6), "src/art/skellie.png", {'standard':5, })
+    skeleton = Enemy("Evil Knight", 20, (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
 
     #load game state
     skeleton.defeated = DATA['skelDead']
@@ -137,7 +137,7 @@ def combat(player, enemy):
         if attackButton.rect.collidepoint((mouseX, mouseY)) and clicked:
             clicked = False
             playerDamage = player.attack('standard')
-            enemyDamage = enemy.attacks[numpy.random.choice(('standard',))]
+            enemyDamage = enemy.attack(numpy.random.choice(('standard',)))
 
         #wombat controller
         enemy.health -= playerDamage
@@ -158,6 +158,9 @@ def combat(player, enemy):
 
 def fightWon(enemy):
     enemy.defeated = True
+
+def drawFight(player, enemy):
+    None
 
 def drawCombatHUD(health, mana):
     fontHUD = pygame.font.Font("freesansbold.ttf", 36)
