@@ -74,10 +74,10 @@ def runGame():
         #event handler
         for event in pygame.event.get():
             if event.type == QUIT:
-                terminate(upds)
+                terminate()
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    terminate(upds)
+                    terminate()
                 elif event.key == K_d:
                     direction = "right"
                 elif event.key == K_a:
@@ -123,6 +123,7 @@ def runGame():
             posDat.update({'playerX':player.xPos, 'playerY':player.yPos})
             deadFoes.update({'skelDead':skeleton.defeated, 'knightDead':knight.defeated})
             upds = (posDat, deadFoes)
+            saveDat(upds)
         
         FPSCLOCK.tick(FPS)
 
@@ -222,6 +223,9 @@ def drawCombatHUD(health, mana):
     DISPLAYSURF.blit(healthSurf, healthRect)
     DISPLAYSURF.blit(manaSurf, manaRect)
 
+def showGameOver():
+    None
+
 def drawEnemyHUD(name, health):
     fontHUD = pygame.font.Font("freesansbold.ttf", 36)
     nameSurf = fontHUD.render(name, True, WHITE)
@@ -246,8 +250,7 @@ def drawRoom(room):
             DISPLAYSURF.blit(room[x][y].image, room[x][y].rect)
 
 
-def terminate(upds):
-    saveDat(upds)
+def terminate():
     pygame.quit()
     sys.exit()
 
