@@ -5,6 +5,7 @@ from roommap import RoomMap
 from character import Character
 from enemy import Enemy
 from button import Button
+from floortile import FloorTile
 
 # Window and framerates
 FPS = 30
@@ -120,7 +121,7 @@ def combat(player, enemy):
     mouseX = 0
     mouseY = 0
     clicked = False
-    attackButton = Button("src/art/attack_button.png", (550, 600))
+    attackButton = Button("src/art/attack_button.png", (WINDOWWIDTH/2, 600))
     playerDamage = 0
     enemyDamage = 0
     
@@ -150,6 +151,8 @@ def combat(player, enemy):
                 
         #drawing
         DISPLAYSURF.fill(BLACK)
+        DISPLAYSURF.blit(pygame.image.load("src/art/combat_floor.png"), (0, 0, 1600, 900))
+        drawFight(player, enemy)
         DISPLAYSURF.blit(attackButton.image, attackButton.rect)
         drawCombatHUD(player.health, player.mana)
         drawEnemyHUD(enemy.name, enemy.health)
@@ -160,7 +163,8 @@ def fightWon(enemy):
     enemy.defeated = True
 
 def drawFight(player, enemy):
-    None
+    enemy.bigRect.bottomright = (WINDOWWIDTH - 230, 800)
+    DISPLAYSURF.blit(enemy.bigImage, enemy.bigRect)
 
 def drawCombatHUD(health, mana):
     fontHUD = pygame.font.Font("freesansbold.ttf", 36)

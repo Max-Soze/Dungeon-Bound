@@ -9,7 +9,7 @@ class Enemy:
         self.xPos, self.yPos = pos
         self.image = pygame.image.load(image)
         self.rect = self.image.get_rect()
-        self.bigImage = pygame.image.load(bigImage)
+        self.bigImage = pygame.transform.scale(pygame.transform.flip(pygame.image.load(bigImage), True, False), (400, 700))
         self.bigRect = self.bigImage.get_rect()
         self.defeated = False
 
