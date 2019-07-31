@@ -1,4 +1,5 @@
 import pygame, numpy, json, sys, ctypes
+import HUD as comDisp
 from pygame.locals import *
 
 from roommap import RoomMap
@@ -14,15 +15,23 @@ WINDOWHEIGHT = 900
 CELLSIZE = 50
 
 # Colors
+DARKGREEN   = (  0, 155,   0)
 WHITE       = (255, 255, 255)
 BLACK       = (  0,   0,   0)
-RED         = (255,   0,   0)
-GREEN       = (  0, 255,   0)
-DARKGREEN   = (  0, 155,   0)
-DARKGRAY    = ( 40,  40,  40)
+RED         = (171,  39,  25)
+BLUE        = (  9, 109, 150)
+GRAY        = (150, 150, 150)
+DARKGRAY    = ( 40,  40,  40) 
+SHADOW      = (192, 192, 192)
+LIGHTGREEN  = (  0, 255,   0)
+GREEN       = (  0, 200,   0)
+LIGHTBLUE   = (  0,   0, 255)
+LIGHTRED    = (255, 100, 100)
+PURPLE      = (102,   0, 102)
+LIGHTPURPLE = (153,   0, 153)
 
 #Other
-DATA = {"playerX":0, "playerY":0, 'skelDead':False}
+DATA = {"playerX":0, "playerY":0, 'skelDead':False, 'knightDead':False}
 
 def main():
     global FPSCLOCK, DISPLAYSURF
@@ -62,20 +71,22 @@ def runGame():
 
     #testing
     test = RoomMap("floor")
-    skeleton = Enemy("Evil Knight", 20, (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
+    skeleton = Enemy("Evil Knight", numpy.random.randint(15, 30), (4, 6), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
+    knight = Enemy("Evil Knight", numpy.random.randint(15, 30), (7, 3), "src/art/evil_knight.png", "src/art/evil_knight_large.png", {'standard':numpy.random.randint(4,8), })
 
     #load game state
     skeleton.defeated = DATA['skelDead']
+    knight.defeated = DATA['knightDead']
     
 
     while(True):
         #event handler
         for event in pygame.event.get():
             if event.type == QUIT:
-                terminate(upds)
+                terminate()
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    terminate(upds)
+                    terminate()
                 elif event.key == K_d:
                     direction = "right"
                 elif event.key == K_a:
@@ -101,6 +112,8 @@ def runGame():
 
         if player.xPos == skeleton.xPos and player.yPos == skeleton.yPos and not skeleton.defeated:
             combat(player, skeleton)
+        if player.xPos == knight.xPos and player.yPos == knight.yPos and not knight.defeated:
+            combat(player, knight)
 
         # drawing
         DISPLAYSURF.fill(BLACK)
@@ -108,6 +121,8 @@ def runGame():
         drawRoom(test.map)
         if not skeleton.defeated:
             drawChar(skeleton)
+        if not knight.defeated:
+            drawChar(knight)
         drawChar(player)
         pygame.display.update()
         
@@ -115,8 +130,9 @@ def runGame():
         if saving == True:
             saving = False
             posDat.update({'playerX':player.xPos, 'playerY':player.yPos})
-            deadFoes.update({'skelDead':skeleton.defeated})
+            deadFoes.update({'skelDead':skeleton.defeated, 'knightDead':knight.defeated})
             upds = (posDat, deadFoes)
+            saveDat(upds)
         
         FPSCLOCK.tick(FPS)
 
@@ -128,12 +144,13 @@ def combat(player, enemy):
     attackButton = Button("src/art/attack_button.png", (WINDOWWIDTH/2, 600))
     playerDamage = 0
     enemyDamage = 0
+    lastDamage = 0
     
     while(True):
         #event handler
         for event in pygame.event.get():
             if event.type == QUIT:
-                terminate(())
+                terminate()
             elif event.type == MOUSEBUTTONUP:
                 mouseX, mouseY = event.pos
                 clicked = True
@@ -143,12 +160,11 @@ def combat(player, enemy):
             clicked = False
             playerDamage = player.attack('standard')
             enemyDamage = enemy.attack(numpy.random.choice(('standard',)))
+            lastDamage = enemyDamage
 
         #wombat controller
         enemy.health -= playerDamage
         player.health -= enemyDamage
-        playerDamage = 0
-        enemyDamage = 0
         if enemy.health <= 0:
             fightWon(enemy)
             return
@@ -158,18 +174,27 @@ def combat(player, enemy):
         DISPLAYSURF.blit(pygame.image.load("src/art/combat_floor.png"), (0, 0, 1600, 900))
         drawFight(player, enemy)
         DISPLAYSURF.blit(attackButton.image, attackButton.rect)
-        drawCombatHUD(player.health, player.mana)
-        drawEnemyHUD(enemy.name, enemy.health)
+        #drawCombatHUD(player.health, player.mana)
+        #drawEnemyHUD(enemy.name, enemy.health)
+        comDisp.drawHUDWin(DISPLAYSURF)
+        comDisp.healthBar(DISPLAYSURF, player.health * 7, player.health)
+        comDisp.manaBar(DISPLAYSURF)
+        comDisp.damageInfo(DISPLAYSURF, enemyDamage, enemy.health, lastDamage)
         pygame.display.update()
+
+        #Reset variables
+        playerDamage = 0
+        enemyDamage = 0
+
         FPSCLOCK.tick(FPS)
 
 def fightWon(enemy):
     enemy.defeated = True
 
 def drawFight(player, enemy):
-    enemy.bigRect.bottomright = (WINDOWWIDTH - 230, 800)
+    enemy.bigRect.bottomright = (WINDOWWIDTH - 230, 850)
     DISPLAYSURF.blit(enemy.bigImage, enemy.bigRect)
-    player.rect_big.bottomleft = (230, 800)
+    player.rect_big.bottomleft = (230, 850)
     DISPLAYSURF.blit(player.image_big, player.rect_big)
 
 def showStartScreen():
@@ -216,6 +241,9 @@ def drawCombatHUD(health, mana):
     DISPLAYSURF.blit(healthSurf, healthRect)
     DISPLAYSURF.blit(manaSurf, manaRect)
 
+def showGameOver():
+    None
+
 def drawEnemyHUD(name, health):
     fontHUD = pygame.font.Font("freesansbold.ttf", 36)
     nameSurf = fontHUD.render(name, True, WHITE)
@@ -240,8 +268,7 @@ def drawRoom(room):
             DISPLAYSURF.blit(room[x][y].image, room[x][y].rect)
 
 
-def terminate(upds):
-    saveDat(upds)
+def terminate():
     pygame.quit()
     sys.exit()
 

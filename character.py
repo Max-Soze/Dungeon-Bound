@@ -5,7 +5,7 @@ class Character:
     def __init__(self, hp, mp):
         self.health = hp
         self.mana = mp
-        self.attacks = {'standard':numpy.random.randint(6,9)}
+        self.attacks = {'standard':numpy.random.randint(6,10)}
         self.inventory = []
         self.xPos = 0
         self.yPos = 0

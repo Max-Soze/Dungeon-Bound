@@ -6,6 +6,7 @@ __pycache__/*
 # Build files
 setup.py
 build/*
+dist/*
 
 # Src, and VS files
 .vs/*
