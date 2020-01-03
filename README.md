@@ -7,3 +7,5 @@ Controls are simple:
 - WASD to move
 - P to save (stored in .json in src folder)
 - Click for the attack button
+
+(Art files missing, so have to sub your own to run)
